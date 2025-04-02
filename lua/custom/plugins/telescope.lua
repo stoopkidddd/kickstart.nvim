@@ -42,8 +42,7 @@ return {
     -- vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = '[S]earch [F]iles' })
     vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = '[S]earch by [G]rep' })
     vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = '[Git] [S]tatus' })
-    vim.keymap.set('n', '<leader>cd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-    vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[ ] Find existing buffers' })
+    vim.keymap.set('n', '<leader>bb', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
     -- Shortcut for searching your Neovim configuration files
     vim.keymap.set('n', '<leader>sn', function()

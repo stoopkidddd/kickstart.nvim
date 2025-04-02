@@ -33,4 +33,4 @@ vim.keymap.set('n', '<leader>tt', function()
   run_jest()
 end, { desc = 'Jest Test' })
 
-vim.keymap.set('n', '<leader>bd', ':bp<bar>bd #<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>bd', ':bp<bar>bd #<CR>', { noremap = true, silent = true, desc = '[B]uffer [D]elete' })
