@@ -1,8 +1,3 @@
-local function has_words_before()
-  local line, col = (unpack or table.unpack)(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match '%s' == nil
-end
-
 ---@type function?, function?
 local icon_provider, hl_provider
 
@@ -85,10 +80,9 @@ return {
   opts = {
     -- remember to enable your providers here
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer' },
+      default = { 'lsp', 'path', 'buffer' },
     },
     keymap = {
-      ['<C-Space>'] = { 'show', 'show_documentation', 'hide_documentation' },
       ['<Up>'] = { 'select_prev', 'fallback' },
       ['<Down>'] = { 'select_next', 'fallback' },
       ['<C-N>'] = { 'select_next', 'show' },
@@ -100,28 +94,21 @@ return {
       ['<C-e>'] = { 'hide', 'fallback' },
       ['<CR>'] = { 'accept', 'fallback' },
       ['<Tab>'] = {
-        'select_next',
+        function(cmp)
+          if cmp.snippet_active() then
+            return cmp.accept()
+          else
+            return cmp.select_and_accept()
+          end
+        end,
         'snippet_forward',
-        function(cmp)
-          if has_words_before() or vim.api.nvim_get_mode().mode == 'c' then
-            return cmp.show()
-          end
-        end,
         'fallback',
       },
-      ['<S-Tab>'] = {
-        'select_prev',
-        'snippet_backward',
-        function(cmp)
-          if vim.api.nvim_get_mode().mode == 'c' then
-            return cmp.show()
-          end
-        end,
-        'fallback',
-      },
+      ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
     },
     completion = {
       list = { selection = { preselect = false, auto_insert = true } },
+      trigger = { show_on_insert_on_trigger_character = true, show_on_keyword = true },
       menu = {
         auto_show = function(ctx)
           return ctx.mode ~= 'cmdline'
@@ -129,14 +116,16 @@ return {
         border = 'rounded',
         winhighlight = 'Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None',
         draw = {
-          treesitter = { 'lsp' },
+          -- We don't need label_description now because label and label_description are already
+          -- combined together in label by colorful-menu.nvim.
+          columns = { { 'kind_icon' }, { 'label', gap = 1 } },
           components = {
-            kind_icon = {
+            label = {
               text = function(ctx)
-                return get_kind_icon(ctx).text
+                return require('colorful-menu').blink_components_text(ctx)
               end,
               highlight = function(ctx)
-                return get_kind_icon(ctx).highlight
+                return require('colorful-menu').blink_components_highlight(ctx)
               end,
             },
           },
@@ -153,6 +142,7 @@ return {
           winhighlight = 'Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None',
         },
       },
+      ghost_text = { enabled = true },
     },
     signature = {
       window = {
@@ -162,11 +152,6 @@ return {
     },
   },
   specs = {
-    {
-      'L3MON4D3/LuaSnip',
-      optional = true,
-      specs = { { 'Saghen/blink.cmp', opts = { snippets = { preset = 'luasnip' } } } },
-    },
     {
       'folke/lazydev.nvim',
       optional = true,

@@ -6,14 +6,14 @@ return {
   end,
   keys = {
     {
-      '<c-j>',
+      '<C-p>',
       function()
         vim.cmd 'CybuPrev'
       end,
       desc = 'Previous Buffer',
     },
     {
-      '<c-k>',
+      '<C-S-P>',
       function()
         vim.cmd 'CybuNext'
       end,

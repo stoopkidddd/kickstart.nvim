@@ -88,24 +88,11 @@ return {
           --  the definition of its *type*, not where it was *defined*.
           map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
 
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
           map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-
-          -- Fuzzy find all the symbols in your current workspace.
-          --  Similar to document symbols, except searches over your entire project.
           map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
 
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
@@ -148,16 +135,6 @@ return {
                 vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
               end,
             })
-          end
-
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, '[T]oggle Inlay [H]ints')
           end
         end,
       })
@@ -240,6 +217,97 @@ return {
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
+        },
+        vtsls = {
+          -- explicitly add default filetypes, so that we can extend
+          -- them in related extras
+          filetypes = {
+            'javascript',
+            'javascriptreact',
+            'javascript.jsx',
+            'typescript',
+            'typescriptreact',
+            'typescript.tsx',
+          },
+          settings = {
+            complete_function_calls = true,
+            vtsls = {
+              enableMoveToFileCodeAction = true,
+              autoUseWorkspaceTsdk = true,
+              experimental = {
+                maxInlayHintLength = 30,
+                completion = {
+                  enableServerSideFuzzyMatch = true,
+                },
+              },
+            },
+            typescript = {
+              updateImportsOnFileMove = { enabled = 'always' },
+              suggest = {
+                completeFunctionCalls = true,
+              },
+              inlayHints = {
+                enumMemberValues = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                parameterNames = { enabled = 'literals' },
+                parameterTypes = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+                variableTypes = { enabled = false },
+              },
+            },
+          },
+          -- keys = {
+          --   {
+          --     'gD',
+          --     function()
+          --       local params = vim.lsp.util.make_position_params()
+          --       LazyVim.lsp.execute {
+          --         command = 'typescript.goToSourceDefinition',
+          --         arguments = { params.textDocument.uri, params.position },
+          --         open = true,
+          --       }
+          --     end,
+          --     desc = 'Goto Source Definition',
+          --   },
+          --   {
+          --     'gR',
+          --     function()
+          --       LazyVim.lsp.execute {
+          --         command = 'typescript.findAllFileReferences',
+          --         arguments = { vim.uri_from_bufnr(0) },
+          --         open = true,
+          --       }
+          --     end,
+          --     desc = 'File References',
+          --   },
+          --   {
+          --     '<leader>co',
+          --     LazyVim.lsp.action['source.organizeImports'],
+          --     desc = 'Organize Imports',
+          --   },
+          --   {
+          --     '<leader>cM',
+          --     LazyVim.lsp.action['source.addMissingImports.ts'],
+          --     desc = 'Add missing imports',
+          --   },
+          --   {
+          --     '<leader>cu',
+          --     LazyVim.lsp.action['source.removeUnused.ts'],
+          --     desc = 'Remove unused imports',
+          --   },
+          --   {
+          --     '<leader>cD',
+          --     LazyVim.lsp.action['source.fixAll.ts'],
+          --     desc = 'Fix all diagnostics',
+          --   },
+          --   {
+          --     '<leader>cV',
+          --     function()
+          --       LazyVim.lsp.execute { command = 'typescript.selectTypeScriptVersion' }
+          --     end,
+          --     desc = 'Select TS workspace version',
+          --   },
+          -- },
         },
       }
 
