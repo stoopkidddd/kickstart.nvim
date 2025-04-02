@@ -21,13 +21,23 @@ return { -- Collection of various small independent plugins/modules
     -- Simple and easy statusline.
     --  You could remove this setup call if you don't like it,
     --  and try some other statusline plugin
-    local statusline = require 'mini.statusline'
-    -- set use_icons to true if you have a Nerd Font
-    statusline.setup { use_icons = vim.g.have_nerd_font }
+    -- local statusline = require 'mini.statusline'
+    -- -- set use_icons to true if you have a Nerd Font
+    -- statusline.setup { use_icons = vim.g.have_nerd_font }
+    --
+    -- statusline.section_location = function()
+    --   return '%2l:%-2v'
+    -- end
 
-    statusline.section_location = function()
-      return '%2l:%-2v'
-    end
+    require('mini.indentscope').setup {
+      draw = {
+        delay = 0,
+        animation = require('mini.indentscope').gen_animation.none(),
+        predicate = function(scope)
+          return not scope.body.is_incomplete
+        end,
+      },
+    }
 
     require('mini.misc').setup()
     MiniMisc.setup_auto_root()
