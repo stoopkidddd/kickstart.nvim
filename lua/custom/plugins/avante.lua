@@ -7,11 +7,25 @@ return {
     vendors = {
       perplexity = {
         __inherited_from = 'openai',
-        api_key_name = 'cmd:bw get notes perplexity-work',
+        api_key_name = 'PERPLEXITY_API_KEY',
         endpoint = 'https://api.perplexity.ai',
         model = 'sonar-reasoning-pro',
       },
+      openrouter = {
+        __inherited_from = 'openai',
+        endpoint = 'https://openrouter.ai/api/v1',
+        api_key_name = 'OPENROUTER_API_KEY',
+        model = 'google/gemini-2.5-pro-preview-03-25',
+      },
     },
+    -- rag_service = {
+    --   enabled = true,
+    --   host_mount = os.getenv 'HOME', -- Host mount path for the rag service
+    --   provider = 'ollama', -- The provider to use for RAG service (e.g. openai or ollama)
+    --   llm_model = '', -- The LLM model to use for RAG service
+    --   embed_model = '', -- The embedding model to use for RAG service
+    --   endpoint = 'https://api.openai.com/v1', -- The API endpoint for RAG service
+    -- },
   },
   build = 'make',
   dependencies = {

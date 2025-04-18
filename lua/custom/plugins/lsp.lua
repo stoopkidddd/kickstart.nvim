@@ -35,13 +35,13 @@ return {
       { 'gI', vim.lsp.buf.implementation, desc = 'Goto Implementation' },
       { 'gy', vim.lsp.buf.type_definition, desc = 'Goto T[y]pe Definition' },
       { 'gD', vim.lsp.buf.declaration, desc = 'Goto Declaration' },
-      {
-        'K',
-        function()
-          return vim.lsp.buf.hover { border = 'rounded' }
-        end,
-        desc = 'Hover',
-      },
+      -- {
+      --   'K',
+      --   function()
+      --     return vim.lsp.buf.hover { border = 'rounded' }
+      --   end,
+      --   desc = 'Hover',
+      -- },
       {
         'gK',
         function()
@@ -114,13 +114,13 @@ return {
         end,
       })
 
-      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = 'single',
-      })
-
-      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        border = 'single',
-      })
+      -- vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
+      --   border = 'single',
+      -- })
+      --
+      -- vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+      --   border = 'single',
+      -- })
 
       -- Diagnostic Config
       -- See :help vim.diagnostic.Opts
@@ -173,6 +173,16 @@ return {
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
+        cspell = {
+          filetypes = {
+            'javascript',
+            'javascriptreact',
+            'javascript.jsx',
+            'typescript',
+            'typescriptreact',
+            'typescript.tsx',
+          },
+        },
 
         lua_ls = {
           -- cmd = { ... },
@@ -195,6 +205,9 @@ return {
               command = 'EslintFixAll',
             })
           end,
+          workingDirectory = function(bufnr)
+            return { directory = vim.fs.root(bufnr, { 'package.json' }) }
+          end,
         },
         vtsls = {
           -- explicitly add default filetypes, so that we can extend
@@ -208,7 +221,7 @@ return {
             'typescript.tsx',
           },
           settings = {
-            complete_function_calls = true,
+            complete_function_calls = false,
             vtsls = {
               enableMoveToFileCodeAction = true,
               autoUseWorkspaceTsdk = true,
@@ -222,7 +235,7 @@ return {
             typescript = {
               updateImportsOnFileMove = { enabled = 'always' },
               suggest = {
-                completeFunctionCalls = true,
+                completeFunctionCalls = false,
               },
               inlayHints = {
                 enumMemberValues = { enabled = true },
@@ -323,5 +336,69 @@ return {
         },
       }
     end,
+  },
+  -- {
+  --   'pmizio/typescript-tools.nvim',
+  --   dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+  --   opts = {},
+  -- },
+  -- {
+  --   'esmuellert/nvim-eslint',
+  --   opts = {
+  --     settings = {
+  --       format = true,
+  --       codeActionOnSave = {
+  --         mode = 'all',
+  --       },
+  --       workingDirectory = function(bufnr)
+  --         return { directory = vim.fs.root(bufnr, { 'package.json' }) }
+  --       end,
+  --     },
+  --   },
+  -- },
+  {
+    'HallerPatrick/py_lsp.nvim',
+    opts = {
+      default_venv_name = '.venv',
+      language_server = 'pylsp',
+      source_strategies = { 'poetry', 'default', 'system' },
+      configurationSources = { 'flake8' },
+      on_attach = function(client)
+        if vim.bo.filetype == 'python' then
+          client.server_capabilities.documentFormattingProvider = false
+          client.server_capabilities.documentRangeFormattingProvider = false
+        end
+      end,
+      pylsp_plugins = {
+        autopep8 = {
+          enabled = false,
+        },
+        pycodestyle = {
+          enabled = false,
+        },
+        pydocstyle = {
+          enabled = true,
+        },
+        pyls_mypy = {
+          enabled = true,
+        },
+        pyls_isort = {
+          enabled = true,
+        },
+        pylint = {
+          enabled = true,
+          args = { '--disable=C0301' },
+        },
+        flake8 = {
+          enabled = false,
+          executable = '.venv/bin/flake8',
+          ignore = { 'E501' },
+        },
+        ruff = {
+          enabled = true,
+          extendIgnore = { 'E501' },
+        },
+      },
+    },
   },
 }
