@@ -81,6 +81,9 @@ return {
     -- remember to enable your providers here
     sources = {
       default = { 'lsp', 'path', 'buffer' },
+      per_filetype = {
+        codecompanion = { 'codecompanion' },
+      },
     },
     keymap = {
       ['<Up>'] = { 'select_prev', 'fallback' },
