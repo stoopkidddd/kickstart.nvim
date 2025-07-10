@@ -11,16 +11,28 @@ return {
     },
     strategies = {
       chat = {
-        adapter = 'openrouter_claude',
+        adapter = 'copilot',
       },
       inline = {
-        adapter = 'openrouter_claude',
+        adapter = 'copilot',
       },
       cmd = {
-        adapter = 'openrouter claude',
+        adapter = 'copilot',
       },
     },
     adapters = {
+      copilot = function()
+        return require('codecompanion.adapters').extend('copilot', {
+          schema = {
+            model = {
+              default = 'claude-3.7-sonnet',
+            },
+            max_tokens = {
+              default = 64000,
+            },
+          },
+        })
+      end,
       openrouter_claude = function()
         return require('codecompanion.adapters').extend('openai_compatible', {
           env = {
@@ -37,6 +49,14 @@ return {
       end,
     },
     extensions = {
+      mcphub = {
+        callback = 'mcphub.extensions.codecompanion',
+        opts = {
+          show_result_in_chat = true, -- Show mcp tool results in chat
+          make_vars = true, -- Convert resources to #variables
+          make_slash_commands = true, -- Add prompts as /slash commands
+        },
+      },
       history = {
         enabled = true,
         opts = {
@@ -71,5 +91,6 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'nvim-treesitter/nvim-treesitter',
+    'ravitemer/codecompanion-history.nvim',
   },
 }

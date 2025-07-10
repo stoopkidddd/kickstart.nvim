@@ -206,6 +206,33 @@ return {
             })
           end,
           workingDirectory = function(bufnr)
+            -- First find the git root directory
+            local git_dir = vim.fs.find('.git', {
+              upward = true,
+              path = vim.api.nvim_buf_get_name(bufnr),
+              type = 'directory',
+            })[1]
+
+            print('git_dir', git_dir)
+
+            if git_dir then
+              -- Get the git root (parent directory of .git)
+              local git_root = vim.fn.fnamemodify(git_dir, ':h')
+
+              -- Find the first package.json starting from git root, searching downward
+              local package_json = vim.fs.find('package.json', {
+                upward = false,
+                path = git_root,
+                type = 'file',
+                limit = 1, -- Stop after finding the first one
+              })[1]
+
+              if package_json then
+                return { directory = vim.fn.fnamemodify(package_json, ':h') }
+              end
+            end
+
+            -- Fallback to the original behavior if no Git root or package.json is found
             return { directory = vim.fs.root(bufnr, { 'package.json' }) }
           end,
         },

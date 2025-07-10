@@ -1,3 +1,49 @@
+local function is_relevant_ts_file(filename)
+  if filename:match '%.ts$' or filename:match '%.tsx$' then
+    if not (filename:match '%.stories%.tsx$' or filename:match '%.test%.ts$' or filename:match '%.test%.tsx$') then
+      return true
+    end
+  end
+  return false
+end
+
+vim.keymap.set('n', 'gR', function()
+  vim.lsp.buf_request(0, 'textDocument/references', vim.lsp.util.make_position_params(), function(err, result, ctx, _)
+    if err or not result then
+      return
+    end
+    -- Filter references by filetype (e.g., only show Lua files)
+    local filtered = vim.tbl_filter(function(ref)
+      local uri = ref.uri or ref.targetUri
+      local fname = vim.uri_to_fname(uri)
+      return is_relevant_ts_file(fname)
+    end, result)
+    -- Use Telescope to display filtered results
+    require('telescope.pickers')
+      .new({}, {
+        prompt_title = 'LSP References (excludes tests/stories)',
+        finder = require('telescope.finders').new_table {
+          results = filtered,
+          entry_maker = function(entry)
+            local uri = entry.uri or entry.targetUri
+            local fname = vim.uri_to_fname(uri)
+            return {
+              value = entry,
+              display = fname,
+              ordinal = fname,
+              filename = fname,
+              lnum = entry.range.start.line + 1,
+              col = entry.range.start.character + 1,
+            }
+          end,
+        },
+        previewer = require('telescope.previewers').vim_buffer_cat.new {},
+        sorter = require('telescope.config').values.generic_sorter {},
+      })
+      :find()
+  end)
+end, { desc = 'Telescope LSP references (Lua files only)' })
+
 return {
   'nvim-telescope/telescope.nvim',
   event = 'VimEnter',
