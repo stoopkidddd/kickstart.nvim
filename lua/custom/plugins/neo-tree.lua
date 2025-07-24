@@ -9,6 +9,7 @@ return {
   cmd = 'Neotree',
   keys = {
     { '<leader>e', ':Neotree toggle<CR>', desc = 'NeoTree toggle', silent = true },
+    { '<leader>E', ':Neotree focus<CR>', desc = 'NeoTree focus', silent = true },
   },
   opts = {
     filesystem = {
